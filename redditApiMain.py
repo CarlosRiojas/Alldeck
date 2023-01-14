@@ -1,7 +1,11 @@
 import sys
+import requests
 
 from PyQt6.QtCore import(Qt,QUrl)
-from PyQt6.QtWebEngineCore import (QWebEngineUrlScheme,QWebEngineCookieStore,)
+
+from PyQt6.QtNetwork import (QAuthenticator)
+from client_secret import(clientID,secret)
+from PyQt6.QtWebEngineCore import (QWebEngineUrlScheme,QWebEngineCookieStore,QWebEngineHttpRequest)
 from PyQt6.QtWebEngineWidgets import (QWebEngineView)
 from PyQt6.QtWidgets import (
     QApplication,
@@ -19,15 +23,17 @@ class Window(QMainWindow):
 
         self.setWindowTitle("AllDeck")
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool | Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowStaysOnTopHint)
-        self.setStyleSheet("QMainWindow { background-color:white; min-width: 400px; min-height: 800px;}")
+        self.setStyleSheet("QMainWindow { background-color:black; min-width: 400px; min-height: 800px;}")
         self.grid = QGridLayout()
-        #web engine
-        web = QWebEngineView()
-        web.load(QUrl("https://www.reddit.com"))
-        layout = QVBoxLayout()
-        layout.addWidget(web)
+
+         #auth the app
+        auth = requests.Request.auth(clientID,secret)
+        response = requests.post("https://www.reddit.com/api/v1/access_token", data={"grant_type": "client_credentials"}))
+        accessToken= requests.Response.json()["access_token"]
+
+
         centralWidget = QWidget(self)
-        centralWidget.setLayout(layout)
+        #centralWidget.setLayout(layout)
         self.setCentralWidget(centralWidget)
 
 
@@ -37,5 +43,3 @@ if __name__ == '__main__':
     window = Window()
     window.show()
     sys.exit(app.exec())
-
-
